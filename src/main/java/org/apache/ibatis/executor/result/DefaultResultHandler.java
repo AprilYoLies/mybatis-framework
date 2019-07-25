@@ -38,7 +38,7 @@ public class DefaultResultHandler implements ResultHandler<Object> {
     list = objectFactory.create(List.class);
   }
 
-  @Override
+  @Override // 将 ResultContext 中的结果添加到 list 中
   public void handleResult(ResultContext<?> context) {
     list.add(context.getResultObject());
   }

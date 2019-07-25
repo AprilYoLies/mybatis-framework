@@ -53,7 +53,7 @@ public class DefaultSqlSession implements SqlSession {
   private final boolean autoCommit;
   private boolean dirty;
   private List<Cursor<?>> cursorList;
-
+  // DefaultSqlSession 持有了 configuration、executor、autoCommit 信息
   public DefaultSqlSession(Configuration configuration, Executor executor, boolean autoCommit) {
     this.configuration = configuration;
     this.executor = executor;
@@ -73,7 +73,7 @@ public class DefaultSqlSession implements SqlSession {
   @Override
   public <T> T selectOne(String statement, Object parameter) {
     // Popular vote was to return null on 0 results and throw exception on too many.
-    List<T> list = this.selectList(statement, parameter);
+    List<T> list = this.selectList(statement, parameter); // 获取连接，查询结果，返回结果集
     if (list.size() == 1) {
       return list.get(0);
     } else if (list.size() > 1) {
@@ -135,16 +135,16 @@ public class DefaultSqlSession implements SqlSession {
     return this.selectList(statement, null);
   }
 
-  @Override
+  @Override // 获取连接，查询结果，返回结果集
   public <E> List<E> selectList(String statement, Object parameter) {
-    return this.selectList(statement, parameter, RowBounds.DEFAULT);
+    return this.selectList(statement, parameter, RowBounds.DEFAULT);  // 获取连接，查询结果，返回结果集
   }
 
-  @Override
+  @Override // 获取连接，查询结果，返回结果集
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
-    try {
-      MappedStatement ms = configuration.getMappedStatement(statement);
-      return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
+    try { // 获取对应的 MappedStatement 信息
+      MappedStatement ms = configuration.getMappedStatement(statement); // 通过 statement 获取 MappedStatement
+      return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);  // 获取连接，查询结果，返回结果集
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
     } finally {
@@ -315,16 +315,16 @@ public class DefaultSqlSession implements SqlSession {
   private boolean isCommitOrRollbackRequired(boolean force) {
     return (!autoCommit && dirty) || force;
   }
-
+  // 对集合类型和数组类型进行处理，否则直接返回
   private Object wrapCollection(final Object object) {
-    if (object instanceof Collection) {
+    if (object instanceof Collection) { // 如果参数是集合类型，
       StrictMap<Object> map = new StrictMap<>();
       map.put("collection", object);
       if (object instanceof List) {
         map.put("list", object);
       }
       return map;
-    } else if (object != null && object.getClass().isArray()) {
+    } else if (object != null && object.getClass().isArray()) { // 数组类型的处理
       StrictMap<Object> map = new StrictMap<>();
       map.put("array", object);
       return map;

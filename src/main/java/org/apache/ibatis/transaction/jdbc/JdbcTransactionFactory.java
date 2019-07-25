@@ -39,6 +39,6 @@ public class JdbcTransactionFactory implements TransactionFactory {
 
   @Override
   public Transaction newTransaction(DataSource ds, TransactionIsolationLevel level, boolean autoCommit) {
-    return new JdbcTransaction(ds, level, autoCommit);
+    return new JdbcTransaction(ds, level, autoCommit);   // JdbcTransaction 持有了 dataSource、level、autoCommit 等信息
   }
 }

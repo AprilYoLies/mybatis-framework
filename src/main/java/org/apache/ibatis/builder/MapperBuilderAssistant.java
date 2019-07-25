@@ -68,7 +68,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
   public String getCurrentNamespace() {
     return currentNamespace;
   }
-
+  // 这里说明 namespace 就是根据 mapper 接口类全限定名来确定的，一个 configuration 的 assistant 对应一个 namespace
   public void setCurrentNamespace(String currentNamespace) {
     if (currentNamespace == null) {
       throw new BuilderException("The mapper element requires a namespace attribute to be specified.");
@@ -240,7 +240,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
     return new Discriminator.Builder(configuration, resultMapping, namespaceDiscriminatorMap).build();
   }
-
+  // 将 mapper 相关的全部参数构建为 MappedStatement，然后缓存到 configuration 中
   public MappedStatement addMappedStatement(
       String id,
       SqlSource sqlSource,
@@ -269,7 +269,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
     id = applyCurrentNamespace(id, false);
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
-
+    // 将 mapper 相关的信息通过一个 Builder 封装
     MappedStatement.Builder statementBuilder = new MappedStatement.Builder(configuration, id, sqlSource, sqlCommandType)
         .resource(resource)
         .fetchSize(fetchSize)
@@ -292,7 +292,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     if (statementParameterMap != null) {
       statementBuilder.parameterMap(statementParameterMap);
     }
-
+    // 通过 statementBuilder 构建 MappedStatement
     MappedStatement statement = statementBuilder.build();
     configuration.addMappedStatement(statement);
     return statement;

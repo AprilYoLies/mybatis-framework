@@ -137,9 +137,9 @@ public abstract class BaseExecutor implements Executor {
   }
 
   @SuppressWarnings("unchecked")
-  @Override
+  @Override // 获取连接，查询结果，返回结果集
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
-    ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
+    ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());  // top/aprilyolies/demo/mapper/UserMapper.java (best guess) executing a query top.aprilyolies.demo.mapper.UserMapper.getUserById
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
@@ -152,7 +152,7 @@ public abstract class BaseExecutor implements Executor {
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
-      } else {
+      } else {  // 获取连接，查询结果，返回结果集
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -191,34 +191,34 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
-  @Override
+  @Override // 构建 CacheKey
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
     CacheKey cacheKey = new CacheKey();
-    cacheKey.update(ms.getId());
+    cacheKey.update(ms.getId());  // top.aprilyolies.demo.mapper.UserMapper.getUserById
     cacheKey.update(rowBounds.getOffset());
     cacheKey.update(rowBounds.getLimit());
     cacheKey.update(boundSql.getSql());
-    List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-    TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
+    List<ParameterMapping> parameterMappings = boundSql.getParameterMappings(); // 参数映射集合
+    TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry(); // 里边就是一些类型处理器
     // mimic DefaultParameterHandler logic
     for (ParameterMapping parameterMapping : parameterMappings) {
       if (parameterMapping.getMode() != ParameterMode.OUT) {
         Object value;
-        String propertyName = parameterMapping.getProperty();
-        if (boundSql.hasAdditionalParameter(propertyName)) {
+        String propertyName = parameterMapping.getProperty(); // id
+        if (boundSql.hasAdditionalParameter(propertyName)) {  // 附加属性的处理
           value = boundSql.getAdditionalParameter(propertyName);
         } else if (parameterObject == null) {
           value = null;
-        } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+        } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {  // 看是否有指定的类型处理器
           value = parameterObject;
         } else {
           MetaObject metaObject = configuration.newMetaObject(parameterObject);
           value = metaObject.getValue(propertyName);
         }
-        cacheKey.update(value);
+        cacheKey.update(value); // 将 object 添加到 updateList，更新哈希值
       }
     }
     if (configuration.getEnvironment() != null) {
@@ -320,7 +320,7 @@ public abstract class BaseExecutor implements Executor {
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
-    try {
+    try { // 获取连接，查询结果，返回结果集
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
     } finally {
       localCache.removeObject(key);
@@ -331,9 +331,9 @@ public abstract class BaseExecutor implements Executor {
     }
     return list;
   }
-
+  // 获取真正的连接，设置隔离级别和自动提交信息，如果启动了 statementLog，则创建连接代理类，这将会打印日志信息
   protected Connection getConnection(Log statementLog) throws SQLException {
-    Connection connection = transaction.getConnection();
+    Connection connection = transaction.getConnection();  // 获取真正的连接，设置隔离级别和自动提交信息
     if (statementLog.isDebugEnabled()) {
       return ConnectionLogger.newInstance(connection, statementLog, queryStack);
     } else {

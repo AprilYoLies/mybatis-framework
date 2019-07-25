@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2015 the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,17 +44,17 @@ public class XMLLanguageDriver implements LanguageDriver {
     return builder.parseScriptNode();
   }
 
-  @Override
+  @Override // 创建 SqlSource，持有了 configuration、script、parameterType
   public SqlSource createSqlSource(Configuration configuration, String script, Class<?> parameterType) {
     // issue #3
-    if (script.startsWith("<script>")) {
+    if (script.startsWith("<script>")) {  // <script> 开始的 sql 处理
       XPathParser parser = new XPathParser(script, false, configuration.getVariables(), new XMLMapperEntityResolver());
       return createSqlSource(configuration, parser.evalNode("/script"), parameterType);
     } else {
       // issue #127
-      script = PropertyParser.parse(script, configuration.getVariables());
+      script = PropertyParser.parse(script, configuration.getVariables());  // 猜测是将 ${} 替换为 #{}
       TextSqlNode textSqlNode = new TextSqlNode(script);
-      if (textSqlNode.isDynamic()) {
+      if (textSqlNode.isDynamic()) {  // 看是否是动态 sql 语句？？
         return new DynamicSqlSource(configuration, textSqlNode);
       } else {
         return new RawSqlSource(configuration, script, parameterType);

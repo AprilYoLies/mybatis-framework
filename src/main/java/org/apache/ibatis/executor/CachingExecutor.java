@@ -78,9 +78,9 @@ public class CachingExecutor implements Executor {
 
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
-    BoundSql boundSql = ms.getBoundSql(parameterObject);
-    CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
-    return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    BoundSql boundSql = ms.getBoundSql(parameterObject);  // 通过 sqlSource 构建 BoundSql，持有了 sql、parameterMappings 信息、参数值
+    CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);  // 构建 CacheKey
+    return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql); // 获取连接，查询结果，返回结果集
   }
 
   @Override
@@ -93,7 +93,7 @@ public class CachingExecutor implements Executor {
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
     Cache cache = ms.getCache();
-    if (cache != null) {
+    if (cache != null) {  // 对于缓存的处理
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql);
@@ -105,7 +105,7 @@ public class CachingExecutor implements Executor {
         }
         return list;
       }
-    }
+    } // 获取连接，查询结果，返回结果集
     return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
   }
 
@@ -141,7 +141,7 @@ public class CachingExecutor implements Executor {
     }
   }
 
-  @Override
+  @Override // 构建 CacheKey
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
     return delegate.createCacheKey(ms, parameterObject, rowBounds, boundSql);
   }

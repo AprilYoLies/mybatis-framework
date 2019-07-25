@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2016 the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -80,14 +80,14 @@ public abstract class BaseStatementHandler implements StatementHandler {
     return parameterHandler;
   }
 
-  @Override
+  @Override // 根据条件创建 Statement,设置超时信息,设置 FetchSize
   public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
     ErrorContext.instance().sql(boundSql.getSql());
     Statement statement = null;
     try {
-      statement = instantiateStatement(connection);
-      setStatementTimeout(statement, transactionTimeout);
-      setFetchSize(statement);
+      statement = instantiateStatement(connection); // 根据条件创建 Statement
+      setStatementTimeout(statement, transactionTimeout); // 设置超时信息
+      setFetchSize(statement);  // 设置 FetchSize
       return statement;
     } catch (SQLException e) {
       closeStatement(statement);
@@ -112,16 +112,16 @@ public abstract class BaseStatementHandler implements StatementHandler {
     }
     StatementUtil.applyTransactionTimeout(stmt, queryTimeout, transactionTimeout);
   }
-
+  // 设置 FetchSize
   protected void setFetchSize(Statement stmt) throws SQLException {
-    Integer fetchSize = mappedStatement.getFetchSize();
+    Integer fetchSize = mappedStatement.getFetchSize(); // 查询的数量
     if (fetchSize != null) {
-      stmt.setFetchSize(fetchSize);
+      stmt.setFetchSize(fetchSize); // 设置 FetchSize
       return;
     }
     Integer defaultFetchSize = configuration.getDefaultFetchSize();
     if (defaultFetchSize != null) {
-      stmt.setFetchSize(defaultFetchSize);
+      stmt.setFetchSize(defaultFetchSize);  // 设置 FetchSize
     }
   }
 

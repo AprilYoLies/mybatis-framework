@@ -292,16 +292,16 @@ public final class MappedStatement {
   public String[] getResulSets() {
     return resultSets;
   }
-
+  // 通过 sqlSource 构建 BoundSql，持有了 sql、parameterMappings 信息、参数值
   public BoundSql getBoundSql(Object parameterObject) {
-    BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
-    List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-    if (parameterMappings == null || parameterMappings.isEmpty()) {
+    BoundSql boundSql = sqlSource.getBoundSql(parameterObject); // 通过 SqlSource 构建 BoundSql，BoundSql 持有了 sql、parameterMappings 信息、参数值
+    List<ParameterMapping> parameterMappings = boundSql.getParameterMappings(); // 参数的映射信息
+    if (parameterMappings == null || parameterMappings.isEmpty()) { // 如果没有参数信息，重构 BoundSql
       boundSql = new BoundSql(configuration, boundSql.getSql(), parameterMap.getParameterMappings(), parameterObject);
     }
 
     // check for nested result maps in parameter mappings (issue #30)
-    for (ParameterMapping pm : boundSql.getParameterMappings()) {
+    for (ParameterMapping pm : boundSql.getParameterMappings()) { // 判断是否有嵌入的 map 集合
       String rmId = pm.getResultMapId();
       if (rmId != null) {
         ResultMap rm = configuration.getResultMap(rmId);

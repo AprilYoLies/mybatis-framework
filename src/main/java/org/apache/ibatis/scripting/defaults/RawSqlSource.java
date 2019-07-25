@@ -52,7 +52,7 @@ public class RawSqlSource implements SqlSource {
     return context.getSql();
   }
 
-  @Override
+  @Override // 通过 SqlSource 构建 BoundSql，BoundSql 持有了 sql、parameterMappings 信息、参数值
   public BoundSql getBoundSql(Object parameterObject) {
     return sqlSource.getBoundSql(parameterObject);
   }

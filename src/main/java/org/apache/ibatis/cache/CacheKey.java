@@ -56,7 +56,7 @@ public class CacheKey implements Cloneable, Serializable {
   public int getUpdateCount() {
     return updateList.size();
   }
-
+  // 将 object 添加到 updateList，更新哈希值
   public void update(Object object) {
     int baseHashCode = object == null ? 1 : ArrayUtil.hashCode(object);
 

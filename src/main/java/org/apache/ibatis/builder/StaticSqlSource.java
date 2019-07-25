@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2017 the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class StaticSqlSource implements SqlSource {
     this.configuration = configuration;
   }
 
-  @Override
+  @Override // 通过 SqlSource 构建 BoundSql，BoundSql 持有了 sql、parameterMappings 信息、参数值
   public BoundSql getBoundSql(Object parameterObject) {
     return new BoundSql(configuration, sql, parameterMappings, parameterObject);
   }

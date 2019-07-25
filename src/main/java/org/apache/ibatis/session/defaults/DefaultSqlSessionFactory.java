@@ -29,6 +29,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransaction;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 /**
@@ -42,7 +43,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     this.configuration = configuration;
   }
 
-  @Override
+  @Override // 构建 DefaultSqlSession，DefaultSqlSession 持有了 configuration、executor、autoCommit 信息
   public SqlSession openSession() {
     return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
   }
@@ -86,15 +87,15 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
   public Configuration getConfiguration() {
     return configuration;
   }
-
+  // 构建 DefaultSqlSession，DefaultSqlSession 持有了 configuration、executor、autoCommit 信息
   private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
     try {
       final Environment environment = configuration.getEnvironment();
-      final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
-      tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
-      final Executor executor = configuration.newExecutor(tx, execType);
-      return new DefaultSqlSession(configuration, executor, autoCommit);
+      final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);  // 从 environment 中获取 TransactionFactory
+      tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit); // JdbcTransaction 持有了 dataSource、level、autoCommit 等信息
+      final Executor executor = configuration.newExecutor(tx, execType);  // 根据条件构建 Executor，executor 持有了 configuration 和 transaction 信息
+      return new DefaultSqlSession(configuration, executor, autoCommit);  // 构建 DefaultSqlSession，DefaultSqlSession 持有了 configuration、executor、autoCommit 信息
     } catch (Exception e) {
       closeTransaction(tx); // may have fetched a connection so lets call close()
       throw ExceptionFactory.wrapException("Error opening session.  Cause: " + e, e);

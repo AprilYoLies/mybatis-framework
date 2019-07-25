@@ -51,7 +51,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
     this.configuration = c;
   }
 
-  @Override
+  @Override // 设置 PreparedStatement 指定位置的的参数值
   public void setParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
     if (parameter == null) {
       if (jdbcType == null) {
@@ -65,7 +65,7 @@ public abstract class BaseTypeHandler<T> extends TypeReference<T> implements Typ
               + "Cause: " + e, e);
       }
     } else {
-      try {
+      try { // 设置 PreparedStatement 指定位置的的参数值
         setNonNullParameter(ps, i, parameter, jdbcType);
       } catch (Exception e) {
         throw new TypeException("Error setting non null for parameter #" + i + " with JdbcType " + jdbcType + " . "

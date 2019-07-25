@@ -43,7 +43,7 @@ public class JdbcTransaction implements Transaction {
   protected DataSource dataSource;
   protected TransactionIsolationLevel level;
   protected boolean autoCommit;
-
+  // 持有了 dataSource、level、autoCommit 等信息
   public JdbcTransaction(DataSource ds, TransactionIsolationLevel desiredLevel, boolean desiredAutoCommit) {
     dataSource = ds;
     level = desiredLevel;
@@ -54,10 +54,10 @@ public class JdbcTransaction implements Transaction {
     this.connection = connection;
   }
 
-  @Override
+  @Override // 获取真正的连接，设置隔离级别和自动提交信息
   public Connection getConnection() throws SQLException {
     if (connection == null) {
-      openConnection();
+      openConnection(); // 获取真正的连接，设置隔离级别和自动提交信息
     }
     return connection;
   }
@@ -130,16 +130,16 @@ public class JdbcTransaction implements Transaction {
       }
     }
   }
-
+  // 获取真正的连接，设置隔离级别和自动提交信息
   protected void openConnection() throws SQLException {
     if (log.isDebugEnabled()) {
       log.debug("Opening JDBC Connection");
     }
-    connection = dataSource.getConnection();
-    if (level != null) {
+    connection = dataSource.getConnection();  // 数据源获取连接
+    if (level != null) {  // 如果指定了隔离级别
       connection.setTransactionIsolation(level.getLevel());
     }
-    setDesiredAutoCommit(autoCommit);
+    setDesiredAutoCommit(autoCommit); // 设置自动提交信息
   }
 
   @Override

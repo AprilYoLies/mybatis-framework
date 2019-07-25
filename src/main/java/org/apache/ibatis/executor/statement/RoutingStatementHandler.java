@@ -54,14 +54,14 @@ public class RoutingStatementHandler implements StatementHandler {
 
   }
 
-  @Override
+  @Override // 根据条件创建 Statement,设置超时信息,设置 FetchSize
   public Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException {
-    return delegate.prepare(connection, transactionTimeout);
+    return delegate.prepare(connection, transactionTimeout);  // 根据条件创建 Statement,设置超时信息,设置 FetchSize
   }
 
   @Override
   public void parameterize(Statement statement) throws SQLException {
-    delegate.parameterize(statement);
+    delegate.parameterize(statement); // 从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
   }
 
   @Override
@@ -74,9 +74,9 @@ public class RoutingStatementHandler implements StatementHandler {
     return delegate.update(statement);
   }
 
-  @Override
+  @Override // 从 Statement 获取 ResultSet，将其封装为 ResultSetWrapper，构建 DefaultResultHandler，通过它得到结果集，从 ResultSetWrapper 拿到原始的结果集，根据条件跳过必要的行数，创建结果承载对象，然后完成结果的填充返回， 将 ResultContext 中的结果添加到 list 中，最后将 list 中的结果添加到 multipleResults
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
-    return delegate.query(statement, resultHandler);
+    return delegate.query(statement, resultHandler);  // 从 Statement 获取 ResultSet，将其封装为 ResultSetWrapper，构建 DefaultResultHandler，通过它得到结果集，从 ResultSetWrapper 拿到原始的结果集，根据条件跳过必要的行数，创建结果承载对象，然后完成结果的填充返回， 将 ResultContext 中的结果添加到 list 中，最后将 list 中的结果添加到 multipleResults
   }
 
   @Override

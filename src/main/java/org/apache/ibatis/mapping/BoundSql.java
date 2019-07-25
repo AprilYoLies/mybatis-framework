@@ -40,7 +40,7 @@ public class BoundSql {
   private final Object parameterObject;
   private final Map<String, Object> additionalParameters;
   private final MetaObject metaParameters;
-
+  // BoundSql 持有了 sql、parameterMappings 信息、参数值
   public BoundSql(Configuration configuration, String sql, List<ParameterMapping> parameterMappings, Object parameterObject) {
     this.sql = sql;
     this.parameterMappings = parameterMappings;

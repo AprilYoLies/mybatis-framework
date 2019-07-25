@@ -52,15 +52,15 @@ public class SimpleExecutor extends BaseExecutor {
       closeStatement(stmt);
     }
   }
-
-  @Override
+  // 获取真正的连接，设置隔离级别和自动提交信息，根据条件创建 Statement,设置超时信息,设置 FetchSize，从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
+  @Override // 从 Statement 获取 ResultSet，将其封装为 ResultSetWrapper，构建 DefaultResultHandler，通过它得到结果集，从 ResultSetWrapper 拿到原始的结果集，根据条件跳过必要的行数，创建结果承载对象，然后完成结果的填充返回， 将 ResultContext 中的结果添加到 list 中，最后将 list 中的结果添加到 multipleResults
   public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
-      StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
-      stmt = prepareStatement(handler, ms.getStatementLog());
-      return handler.query(stmt, resultHandler);
+        StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql); // 通过参数构建了 RoutingStatementHandler
+        stmt = prepareStatement(handler, ms.getStatementLog()); // 获取真正的连接，设置隔离级别和自动提交信息，根据条件创建 Statement,设置超时信息,设置 FetchSize，从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
+        return handler.query(stmt, resultHandler);  // 从 Statement 获取 ResultSet，将其封装为 ResultSetWrapper，构建 DefaultResultHandler，通过它得到结果集，从 ResultSetWrapper 拿到原始的结果集，根据条件跳过必要的行数，创建结果承载对象，然后完成结果的填充返回， 将 ResultContext 中的结果添加到 list 中，最后将 list 中的结果添加到 multipleResults
     } finally {
       closeStatement(stmt);
     }
@@ -79,12 +79,12 @@ public class SimpleExecutor extends BaseExecutor {
   public List<BatchResult> doFlushStatements(boolean isRollback) {
     return Collections.emptyList();
   }
-
+  // 获取真正的连接，设置隔离级别和自动提交信息，根据条件创建 Statement,设置超时信息,设置 FetchSize，从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
-    Connection connection = getConnection(statementLog);
-    stmt = handler.prepare(connection, transaction.getTimeout());
-    handler.parameterize(stmt);
+    Connection connection = getConnection(statementLog);  // 获取真正的连接，设置隔离级别和自动提交信息，如果启动了 statementLog，则创建连接代理类，这将会打印日志信息
+    stmt = handler.prepare(connection, transaction.getTimeout()); // 根据条件创建 Statement,设置超时信息,设置 FetchSize
+    handler.parameterize(stmt); // 从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
     return stmt;
   }
 

@@ -56,20 +56,20 @@ public class MapperRegistry {
   public <T> boolean hasMapper(Class<T> type) {
     return knownMappers.containsKey(type);
   }
-
+  // 根据 config，type 构建 MapperAnnotationBuilder，MapperAnnotationBuilder 尝试根据 mapper 类型，加载对应的 mapper.xml，然后完成解析,缓存正在处理的 type 信息，处理 CacheNamespace、CacheNamespaceRef 注解，针对 type 的方法进行处理，将映射相关的一些声明通过 assistant 构建为 MappedStatement，然后缓存到 configuration 中
   public <T> void addMapper(Class<T> type) {
-    if (type.isInterface()) {
-      if (hasMapper(type)) {
+    if (type.isInterface()) { // 接口类型验证
+      if (hasMapper(type)) {  // 重复验证
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
       }
       boolean loadCompleted = false;
       try {
-        knownMappers.put(type, new MapperProxyFactory<>(type));
+        knownMappers.put(type, new MapperProxyFactory<>(type)); // knownMappers 存放的是 mapper 类型和 mapper 对应的代理工厂
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
-        parser.parse();
+        parser.parse(); // 尝试根据 mapper 类型，加载对应的 mapper xml，然后完成解析,缓存正在处理的 type 信息，处理 CacheNamespace、CacheNamespaceRef 注解，针对 type 的方法进行处理，将映射相关的一些声明通过 assistant 构建为 MappedStatement，然后缓存到 configuration 中
         loadCompleted = true;
       } finally {
         if (!loadCompleted) {

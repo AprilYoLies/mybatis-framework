@@ -144,7 +144,7 @@ public class Configuration {
    */
   protected Class<?> configurationFactory;
 
-  protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
+  protected final MapperRegistry mapperRegistry = new MapperRegistry(this); // mapperRegistry 持有了 Configuration
   protected final InterceptorChain interceptorChain = new InterceptorChain();
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
@@ -177,7 +177,7 @@ public class Configuration {
     this();
     this.environment = environment;
   }
-
+  // 注入了一系列的 class 别名
   public Configuration() {
     typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
     typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);
@@ -305,7 +305,7 @@ public class Configuration {
   public void setMapUnderscoreToCamelCase(boolean mapUnderscoreToCamelCase) {
     this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
   }
-
+  // 缓存到 loadedResources 集合中
   public void addLoadedResource(String resource) {
     loadedResources.add(resource);
   }
@@ -554,7 +554,7 @@ public class Configuration {
 
   /**
    * @since 3.5.1
-   */
+   */ // 获取 LanguageDriver，如果参数为空，获取默认的 LanguageDriver，否则获取参数指定的 LanguageDriver
   public LanguageDriver getLanguageDriver(Class<? extends LanguageDriver> langClass) {
     if (langClass == null) {
       return languageRegistry.getDefaultDriver();
@@ -587,7 +587,7 @@ public class Configuration {
     resultSetHandler = (ResultSetHandler) interceptorChain.pluginAll(resultSetHandler);
     return resultSetHandler;
   }
-
+  // 通过参数构建了 RoutingStatementHandler
   public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
     statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
@@ -597,7 +597,7 @@ public class Configuration {
   public Executor newExecutor(Transaction transaction) {
     return newExecutor(transaction, defaultExecutorType);
   }
-
+  // 根据条件构建 Executor，executor 持有了 configuration 和 transaction 信息
   public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
     executorType = executorType == null ? defaultExecutorType : executorType;
     executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
@@ -607,7 +607,7 @@ public class Configuration {
     } else if (ExecutorType.REUSE == executorType) {
       executor = new ReuseExecutor(this, transaction);
     } else {
-      executor = new SimpleExecutor(this, transaction);
+      executor = new SimpleExecutor(this, transaction); // executor 持有了 configuration 和 transaction 信息
     }
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
@@ -770,9 +770,9 @@ public class Configuration {
   public void addMappers(String packageName) {
     mapperRegistry.addMappers(packageName);
   }
-
+  // 根据 config，type 构建 MapperAnnotationBuilder，MapperAnnotationBuilder 尝试根据 mapper 类型，加载对应的 mapper.xml，然后完成解析,缓存正在处理的 type 信息，处理 CacheNamespace、CacheNamespaceRef 注解，针对 type 的方法进行处理，将映射相关的一些声明通过 assistant 构建为 MappedStatement，然后缓存到 configuration 中
   public <T> void addMapper(Class<T> type) {
-    mapperRegistry.addMapper(type);
+    mapperRegistry.addMapper(type); // mapperRegistry 持有了 Configuration
   }
 
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {

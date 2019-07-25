@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     PreparedStatement ps = (PreparedStatement) statement;
     ps.execute();
     return resultSetHandler.handleResultSets(ps);
-  }
+  } // 从 Statement 获取 ResultSet，将其封装为 ResultSetWrapper，构建 DefaultResultHandler，通过它得到结果集，从 ResultSetWrapper 拿到原始的结果集，根据条件跳过必要的行数，创建结果承载对象，然后完成结果的填充返回， 将 ResultContext 中的结果添加到 list 中，最后将 list 中的结果添加到 multipleResults
 
   @Override
   public <E> Cursor<E> queryCursor(Statement statement) throws SQLException {
@@ -72,15 +72,15 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     return resultSetHandler.handleCursorResultSets(ps);
   }
 
-  @Override
+  @Override // 根据条件创建 Statement
   protected Statement instantiateStatement(Connection connection) throws SQLException {
-    String sql = boundSql.getSql();
+    String sql = boundSql.getSql(); // sql 语句
     if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {
       String[] keyColumnNames = mappedStatement.getKeyColumns();
       if (keyColumnNames == null) {
-        return connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        return connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS); // 自动返回生成的 key
       } else {
-        return connection.prepareStatement(sql, keyColumnNames);
+        return connection.prepareStatement(sql, keyColumnNames);  // 指定了 key 信息
       }
     } else if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {
       return connection.prepareStatement(sql);
@@ -89,9 +89,9 @@ public class PreparedStatementHandler extends BaseStatementHandler {
     }
   }
 
-  @Override
+  @Override // 从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
   public void parameterize(Statement statement) throws SQLException {
-    parameterHandler.setParameters((PreparedStatement) statement);
+    parameterHandler.setParameters((PreparedStatement) statement);  // 从 boundSql 获取 parameterMappings，然后将每一项对应的值设置到 ps 中
   }
 
 }
