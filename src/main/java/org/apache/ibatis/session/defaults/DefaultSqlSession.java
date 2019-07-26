@@ -70,7 +70,7 @@ public class DefaultSqlSession implements SqlSession {
     return this.selectOne(statement, null);
   }
 
-  @Override
+  @Override // 获取连接，查询结果，返回结果集
   public <T> T selectOne(String statement, Object parameter) {
     // Popular vote was to return null on 0 results and throw exception on too many.
     List<T> list = this.selectList(statement, parameter); // 获取连接，查询结果，返回结果集
@@ -286,7 +286,7 @@ public class DefaultSqlSession implements SqlSession {
     return configuration;
   }
 
-  @Override
+  @Override // 从 knownMappers 中获取对应的代理工厂，然后根据代理工厂构建相应接口的代理类
   public <T> T getMapper(Class<T> type) {
     return configuration.getMapper(type, this);
   }

@@ -28,7 +28,7 @@ import org.apache.ibatis.session.SqlSession;
 /**
  * @author Clinton Begin
  * @author Eduardo Macarron
- */
+ */ // 其实我们关注的就是 InvocationHandler 实现方法
 public class MapperProxy<T> implements InvocationHandler, Serializable {
 
   private static final long serialVersionUID = -6424540398559729838L;
@@ -45,18 +45,18 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
-      if (Object.class.equals(method.getDeclaringClass())) {
+      if (Object.class.equals(method.getDeclaringClass())) {  // 如果调用的是 Object 的方法，那么调用代理类的对应方法
         return method.invoke(this, args);
-      } else if (method.isDefault()) {
+      } else if (method.isDefault()) {  // 调用默认方法？？
         return invokeDefaultMethod(proxy, method, args);
       }
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
     }
-    final MapperMethod mapperMethod = cachedMapperMethod(method);
-    return mapperMethod.execute(sqlSession, args);
+    final MapperMethod mapperMethod = cachedMapperMethod(method); // 将 method 封装为 MapperMethod 并缓存，MapperMethod 持有了接口信息，configuration
+    return mapperMethod.execute(sqlSession, args);   // 根据 sql 的类型，执行对应的流程
   }
-
+  // 将 method 封装为 MapperMethod 并缓存，MapperMethod 持有了接口信息，configuration
   private MapperMethod cachedMapperMethod(Method method) {
     return methodCache.computeIfAbsent(method, k -> new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
   }

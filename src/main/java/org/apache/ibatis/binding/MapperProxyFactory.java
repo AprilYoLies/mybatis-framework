@@ -42,14 +42,14 @@ public class MapperProxyFactory<T> {
     return methodCache;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")  // 构建 jdk 代理类
   protected T newInstance(MapperProxy<T> mapperProxy) {
     return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
   }
-
+  // 通过 sqlSession, mapperInterface, methodCache 创建 InvocationHandler，然后据此构建 jdk 代理类
   public T newInstance(SqlSession sqlSession) {
-    final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface, methodCache);
-    return newInstance(mapperProxy);
+    final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface, methodCache); // 创建 InvocationHandler
+    return newInstance(mapperProxy);  // 构建 jdk 代理类
   }
 
 }

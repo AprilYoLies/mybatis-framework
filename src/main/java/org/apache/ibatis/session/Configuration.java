@@ -172,7 +172,7 @@ public class Configuration {
    * namespace which the actual cache is bound to.
    */
   protected final Map<String, String> cacheRefMap = new HashMap<>();
-
+  // 完成了一系列 class 的别名映射，持有了 Environment
   public Configuration(Environment environment) {
     this();
     this.environment = environment;
@@ -774,7 +774,7 @@ public class Configuration {
   public <T> void addMapper(Class<T> type) {
     mapperRegistry.addMapper(type); // mapperRegistry 持有了 Configuration
   }
-
+  // 从 knownMappers 中获取对应的代理工厂，然后根据代理工厂构建相应接口的代理类
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
     return mapperRegistry.getMapper(type, sqlSession);
   }

@@ -58,11 +58,11 @@ public class MapperBuilderAssistant extends BaseBuilder {
   private final String resource;
   private Cache currentCache;
   private boolean unresolvedCacheRef; // issue #676
-
+  // 缓存了 configuration，class 别名映射，类型处理器，将资源信息保存到 ErrorContext
   public MapperBuilderAssistant(Configuration configuration, String resource) {
-    super(configuration);
-    ErrorContext.instance().resource(resource);
-    this.resource = resource;
+    super(configuration); // 缓存了 configuration，class 别名映射，类型处理器
+    ErrorContext.instance().resource(resource); // 将资源信息保存到 ErrorContext
+    this.resource = resource; // 资源名称信息
   }
 
   public String getCurrentNamespace() {

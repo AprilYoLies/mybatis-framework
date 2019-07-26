@@ -40,13 +40,13 @@ public class MapperRegistry {
     this.config = config;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")  // 从 knownMappers 中获取对应的代理工厂，然后根据代理工厂构建相应接口的代理类
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
-    final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
+    final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);  // 获取 mapper 代理工厂
     if (mapperProxyFactory == null) {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
-    try {
+    try { // 通过 sqlSession, mapperInterface, methodCache 创建 InvocationHandler，然后据此构建 jdk 代理类
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);
@@ -68,7 +68,7 @@ public class MapperRegistry {
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
-        MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type); // 仅仅是缓存了 Configuration 和 type，同时根据信息构建 MapperBuilderAssistant
         parser.parse(); // 尝试根据 mapper 类型，加载对应的 mapper xml，然后完成解析,缓存正在处理的 type 信息，处理 CacheNamespace、CacheNamespaceRef 注解，针对 type 的方法进行处理，将映射相关的一些声明通过 assistant 构建为 MappedStatement，然后缓存到 configuration 中
         loadCompleted = true;
       } finally {

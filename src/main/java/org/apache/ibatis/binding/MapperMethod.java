@@ -50,13 +50,13 @@ public class MapperMethod {
   private final MethodSignature method;
 
   public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
-    this.command = new SqlCommand(config, mapperInterface, method);
+    this.command = new SqlCommand(config, mapperInterface, method); //
     this.method = new MethodSignature(config, mapperInterface, method);
   }
-
+  // 根据 sql 的类型，执行对应的流程
   public Object execute(SqlSession sqlSession, Object[] args) {
     Object result;
-    switch (command.getType()) {
+    switch (command.getType()) {  // 这里是判断 sql 语句的类型
       case INSERT: {
         Object param = method.convertArgsToSqlCommandParam(args);
         result = rowCountResult(sqlSession.insert(command.getName(), param));
@@ -73,7 +73,7 @@ public class MapperMethod {
         break;
       }
       case SELECT:
-        if (method.returnsVoid() && method.hasResultHandler()) {
+        if (method.returnsVoid() && method.hasResultHandler()) {  // 这里是根据不同的结果类型进行处理
           executeWithResultHandler(sqlSession, args);
           result = null;
         } else if (method.returnsMany()) {
@@ -83,8 +83,8 @@ public class MapperMethod {
         } else if (method.returnsCursor()) {
           result = executeForCursor(sqlSession, args);
         } else {
-          Object param = method.convertArgsToSqlCommandParam(args);
-          result = sqlSession.selectOne(command.getName(), param);
+          Object param = method.convertArgsToSqlCommandParam(args); // 这里是将参数封装为 ParamMap
+          result = sqlSession.selectOne(command.getName(), param);  // 其实根本还是调用的 selectOne，获取连接，查询结果，返回结果集
           if (method.returnsOptional()
               && (result == null || !method.getReturnType().equals(result.getClass()))) {
             result = Optional.ofNullable(result);
@@ -101,7 +101,7 @@ public class MapperMethod {
       throw new BindingException("Mapper method '" + command.getName()
           + " attempted to return null from a method with a primitive return type (" + method.getReturnType() + ").");
     }
-    return result;
+    return result;  // 返回获取的结果
   }
 
   private Object rowCountResult(int rowCount) {

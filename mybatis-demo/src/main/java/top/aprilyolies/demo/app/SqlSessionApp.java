@@ -20,11 +20,10 @@ import java.sql.SQLException;
  * @Date 2019-07-25
  * @Email g863821569@gmail.com
  */
-public class MapperApp {
+public class SqlSessionApp {
   public static void main(String[] args) throws IOException {
-    SqlSessionFactory sessionFactory = buildSessionFactory(buildDataSource());
-    UserMapper mapper = sessionFactory.openSession().getMapper(UserMapper.class); // 从 knownMappers 中获取对应的代理工厂，然后根据代理工厂构建相应接口的代理类
-    User user = mapper.getUserById(6);
+    SqlSession session = buildSessionFactory(buildDataSource(), UserMapper.class).openSession();  // 构建 DefaultSqlSession，DefaultSqlSession 持有了 configuration、executor、autoCommit 信息
+    User user = session.selectOne("top.aprilyolies.demo.mapper.UserMapper.getUserById", 6); // 获取连接，查询结果，返回结果集
     System.out.println(user);
   }
 
@@ -45,11 +44,11 @@ public class MapperApp {
   }
 
   // 构建 SqlSessionFactory，用于和数据库进行交互
-  private static SqlSessionFactory buildSessionFactory(DataSource dataSource) {
+  private static SqlSessionFactory buildSessionFactory(DataSource dataSource, Class clazz) {
     TransactionFactory transactionFactory = new JdbcTransactionFactory();
-    Environment environment = new Environment("development", transactionFactory, dataSource); // 构建 Environment，持有了 TransactionFactory 和 DataSource
-    Configuration configuration = new Configuration(environment); // 完成了一系列 class 的别名映射，持有了 Environment
-    configuration.addMapper(UserMapper.class);
+    Environment environment = new Environment("development", transactionFactory, dataSource);
+    Configuration configuration = new Configuration(environment);
+    configuration.addMapper(clazz); // 根据 config，type 构建 MapperAnnotationBuilder，MapperAnnotationBuilder 尝试根据 mapper 类型，加载对应的 mapper.xml，然后完成解析,缓存正在处理的 type 信息，处理 CacheNamespace、CacheNamespaceRef 注解，针对 type 的方法进行处理，将映射相关的一些声明通过 assistant 构建为 MappedStatement，然后缓存到 configuration 中
     return new SqlSessionFactoryBuilder().build(configuration);
   }
 }

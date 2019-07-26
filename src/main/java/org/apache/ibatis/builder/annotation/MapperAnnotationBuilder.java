@@ -104,7 +104,7 @@ public class MapperAnnotationBuilder {
   private final MapperBuilderAssistant assistant;
   private final Class<?> type;
 
-  static {
+  static {  // 完成对应注解的信息添加
     SQL_ANNOTATION_TYPES.add(Select.class);
     SQL_ANNOTATION_TYPES.add(Insert.class);
     SQL_ANNOTATION_TYPES.add(Update.class);
@@ -115,10 +115,10 @@ public class MapperAnnotationBuilder {
     SQL_PROVIDER_ANNOTATION_TYPES.add(UpdateProvider.class);
     SQL_PROVIDER_ANNOTATION_TYPES.add(DeleteProvider.class);
   }
-
+  // 仅仅是缓存了 Configuration 和 type，同时根据信息构建 MapperBuilderAssistant
   public MapperAnnotationBuilder(Configuration configuration, Class<?> type) {
     String resource = type.getName().replace('.', '/') + ".java (best guess)";
-    this.assistant = new MapperBuilderAssistant(configuration, resource);
+    this.assistant = new MapperBuilderAssistant(configuration, resource);  // 缓存了 configuration，class 别名映射，类型处理器，将资源信息保存到 ErrorContext
     this.configuration = configuration;
     this.type = type;
   }

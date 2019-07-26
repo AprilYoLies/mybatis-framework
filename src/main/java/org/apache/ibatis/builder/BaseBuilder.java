@@ -35,7 +35,7 @@ public abstract class BaseBuilder {
   protected final Configuration configuration;
   protected final TypeAliasRegistry typeAliasRegistry;
   protected final TypeHandlerRegistry typeHandlerRegistry;
-
+  // 缓存了 configuration，class 别名映射，类型处理器
   public BaseBuilder(Configuration configuration) {
     this.configuration = configuration;
     this.typeAliasRegistry = this.configuration.getTypeAliasRegistry();

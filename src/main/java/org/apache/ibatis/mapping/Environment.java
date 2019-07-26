@@ -26,7 +26,7 @@ public final class Environment {
   private final String id;
   private final TransactionFactory transactionFactory;
   private final DataSource dataSource;
-
+  // 构建 Environment，持有了 TransactionFactory 和 DataSource
   public Environment(String id, TransactionFactory transactionFactory, DataSource dataSource) {
     if (id == null) {
       throw new IllegalArgumentException("Parameter 'id' must not be null");
